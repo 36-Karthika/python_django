@@ -1,0 +1,29 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h3 class="text-center mb-4">Shop by Category</h3>
+<div class="row">
+  {% for c in categories %}
+  <div class="col-md-3 mb-3">
+    <div class="card text-center">
+
+      {% if c.image %}
+        <img src="{{ c.image.url }}" class="card-img-top"
+             style="height:200px;object-fit:cover;">
+      {% else %}
+        <img src="https://via.placeholder.com/300x200?text=No+Image"
+             class="card-img-top"
+             style="height:200px;object-fit:cover;">
+      {% endif %}
+
+      <div class="card-body">
+        <h5>{{ c.name }}</h5>
+        <a href="{% url 'category_view' c.id %}"
+           class="btn btn-primary btn-sm">View</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}

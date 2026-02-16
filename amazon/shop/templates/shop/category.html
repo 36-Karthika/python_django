@@ -1,0 +1,16 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<h3>{{ category.name }}</h3>
+<div class="row">
+  {% for s in subs %}
+  <div class="col-md-3 mb-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <h5>{{ s.name }}</h5>
+        <a href="{% url 'subcategory_view' s.id %}" class="btn btn-outline-primary btn-sm">View</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}

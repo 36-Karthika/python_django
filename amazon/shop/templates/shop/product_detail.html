@@ -1,0 +1,66 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <img src="{{ product.image.url }}" class="img-fluid" style="max-height:400px;object-fit:cover;">
+  </div>
+  <div class="col-md-7">
+    <h3>{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    <h5>Price: ₹{{ product.price }}</h5>
+    <p>Average Rating: ⭐ {{ avg }}/5</p>
+    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-success">Add to Cart</a>
+
+    <hr>
+    <h5>Rate this product</h5>
+    <div id="star-container" data-product="{{ product.id }}">
+      {% for i in "12345" %}
+        <span class="star" data-value="{{ forloop.counter }}">&#9733;</span>
+      {% endfor %}
+      <span id="avg">Avg: {{ avg }}⭐ ({{ reviews.count }} reviews)</span>
+    </div>
+  </div>
+</div>
+
+<hr>
+<h4>Write a Review</h4>
+<form method="post">{% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary">Submit Review</button>
+</form>
+
+<hr>
+<h4>Customer Reviews</h4>
+{% for r in reviews %}
+<div class="border rounded p-2 mb-2 bg-white">
+  <b>{{ r.user.username }}</b> — ⭐ {{ r.rating }}<br>
+  {{ r.comment }}<br>
+  <small class="text-muted">{{ r.created_at|date:"M d, Y" }}</small>
+</div>
+{% empty %}
+<p>No reviews yet.</p>
+{% endfor %}
+
+<script>
+const stars = document.querySelectorAll('.star');
+stars.forEach(star => {
+  star.addEventListener('click', () => {
+    const value = star.dataset.value;
+    const productId = document.getElementById('star-container').dataset.product;
+    fetch(`/rate_product/${productId}/`, {
+      method: 'POST',
+      headers: {'X-CSRFToken': '{{ csrf_token }}','Content-Type':'application/x-www-form-urlencoded'},
+      body: `rating=${value}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('avg').innerText = `Avg: ${data.avg}⭐ (${data.count} reviews)`;
+        stars.forEach(s => s.classList.remove('selected'));
+        for (let i = 0; i < value; i++) stars[i].classList.add('selected');
+      }
+    });
+  });
+});
+</script>
+{% endblock content %}
